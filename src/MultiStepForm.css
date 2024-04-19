@@ -170,7 +170,7 @@ button:hover {
 }
 
 .body {
-    padding-bottom: 50px;
+    padding-bottom: 200px;
     background-image: url('https://wallpapercave.com/wp/wp9198096.jpg');
     background-position: center;
     background-repeat: no-repeat;
@@ -325,4 +325,58 @@ button:hover {
 
 .preview-details strong {
     margin-right: 8px;
+}
+
+/* Style for the input fields of 10th details */
+.input-group.tenth-details {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+}
+
+/* Style for the input fields of intermediate details */
+.input-group.intermediate-details {
+    display: none;
+}
+
+/* Style for the "Add More" button */
+.button-group.add-more {
+    display: block;
+    margin-top: 10px;
+}
+
+/* Hide the "Add More" button after the second click */
+.button-group.add-more.hide {
+    display: none;
+}
+
+.input-group.tenth-details,
+.input-group.intermediate-details {
+    margin-bottom: 10px;
+}
+
+.input-group.tenth-details input,
+.input-group.intermediate-details input,
+.input-group.tenth-details select,
+.input-group.intermediate-details select {
+    width: calc(100% - 20px);
+    /* Adjust width as needed */
+    padding: 8px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.input-group.tenth-details select,
+.input-group.intermediate-details select {
+    cursor: pointer;
+}
+
+.button-group.add-more {
+    margin-top: 10px;
+}
+
+.button-group.add-more.hide {
+    display: none;
 }
