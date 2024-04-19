@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './MultiStepForm.css'; // Import CSS file for styling
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
@@ -55,32 +55,45 @@ const MultiStepForm = () => {
   const totalSteps = 4; // Total number of steps in the form
 
   const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState({
-    name: '',
-    surname: '',
-    mobile: '',
-    gender: '', // Added gender field
-    email: '',
-    permanentAddress: '',
-    currentAddress: '',
-    pincode: '',
-    state: '',
-    city: '',
-    graduation: '',
-    branch: '', // Added branch field
-    year: '',
-    image: null // Added image field
+  const [formData, setFormData] = useState(() => {
+    const storedData = localStorage.getItem('formData');
+    return storedData ? JSON.parse(storedData) : {
+      name: '',
+      surname: '',
+      mobile: '',
+      gender: '',
+      email: '',
+      permanentAddress: '',
+      currentAddress: '',
+      pincode: '',
+      state: '',
+      city: '',
+      graduation: '',
+      branch: '',
+      year: '',
+      image: null,
+      tenthSchool: '',
+      tenthPercentage: '',
+      tenthPassOutYear: '',
+      interCollege: '',
+      interPercentage: '',
+      interPassOutYear: ''
+    };
   });
   const [errors, setErrors] = useState({});
   const [selectedDegree, setSelectedDegree] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [supermanProgress, setSupermanProgress] = useState(0);
+  const [addMoreClicked, setAddMoreClicked] = useState(0);
+
+  useEffect(() => {
+    localStorage.setItem('formData', JSON.stringify(formData));
+  }, [formData]);
 
   const progress = ((step - 1) / (totalSteps - 1)) * 100;
 
   let supermanLeftPosition = `calc(${progress}% + 50px)`; // Adjust the '50px' based on the width of the Superman image
 
-  // Adjust progress increment for each step
   const stepProgress = [0, 25, 50, 75, 100];
 
   const handleChange = (e) => {
@@ -182,7 +195,13 @@ const MultiStepForm = () => {
                 graduation: '',
                 branch: '',
                 year: '',
-                image: null
+                image: null,
+                tenthSchool: '',
+                tenthPercentage: '',
+                tenthPassOutYear: '',
+                interCollege: '',
+                interPercentage: '',
+                interPassOutYear: ''
               });
               setSupermanProgress(0); // Reset Superman progress after submission
             }, 3000); // Wait for 3 seconds before showing the alert
@@ -221,8 +240,8 @@ const MultiStepForm = () => {
 
     doc.setFontSize(18);
     doc.setFont('Times New Roman', 'bold');
-    doc.text('Data', 105, 15, { align: 'center' }); 
-    
+    doc.text('Data', 105, 15, { align: 'center' });
+
     const tableData = [
       ['Field', 'Value'],
       ['Surname', formData.surname],
@@ -235,16 +254,17 @@ const MultiStepForm = () => {
       ['Pincode', formData.pincode],
       ['State', formData.state],
       ['City', formData.city],
+      ['10th School', formData.tenthSchool],
       ['10th Percentage', formData.tenthPercentage],
+      ['10th Pass Out Year', formData.tenthPassOutYear],
+      ['Intermediate College', formData.interCollege],
       ['Intermediate Percentage', formData.interPercentage],
+      ['Intermediate Pass Out Year', formData.interPassOutYear],
+      ['University', formData.university],
       ['Graduation', formData.graduation],
       ['Branch', formData.branch],
-      ['Year', formData.year],
-      ['Passed Out Year', formData.passedOutYear],
+      ['Year', formData.year]
     ];
-
-    const backgroundImageUrl = 'path_to_your_image.jpg'; // Provide the path to your background image
-    doc.addImage(backgroundImageUrl, 'JPEG', 0, 0, 210, 297);
 
     doc.autoTable({
       head: [tableData[0]],
@@ -263,9 +283,6 @@ const MultiStepForm = () => {
         lineWidth: 0.1
       },
       headStyles: {
-        // fillColor: [255, 255, 255],
-        // textColor: [0, 0, 0], 
-        // lineWidth: 0.1 
         fontStyle: 'bold',
         fontSize: 14
       }
@@ -274,6 +291,13 @@ const MultiStepForm = () => {
     doc.save('form_data.pdf');
   };
 
+  const handleAddMore = () => {
+    if (addMoreClicked === 0) {
+      setAddMoreClicked(1);
+    } else if (addMoreClicked === 1) {
+      setAddMoreClicked(2);
+    }
+  };
 
   return (
     <div className="body">
@@ -286,15 +310,18 @@ const MultiStepForm = () => {
         </div>
 
         <form onSubmit={handleSubmit}>
+          {/* Step 1 */}
           {step === 1 && (
             <div className="form-step">
               <h2 className="heading">Personal Information</h2>
-
               <div className="input-group">
                 <input type="text" name="surname" placeholder="Surname" value={formData.surname} onChange={handleChange} required />
               </div>
               <div className="input-group">
-                <input type="text" name="name" placeholder="Name" value={formData.name} onChange={handleChange} required />
+                <input type="text" name="middlename" placeholder="Middle name" value={formData.middlename} onChange={handleChange} />
+              </div>
+              <div className="input-group">
+                <input type="text" name="name" placeholder="Last Name" value={formData.name} onChange={handleChange} required />
                 {errors.name && <p className="error-message">{errors.name}</p>}
               </div>
               <div className="input-group">
@@ -364,16 +391,13 @@ const MultiStepForm = () => {
           {step === 3 && (
             <div className="form-step">
               <h2>Education Details</h2>
+
               <div className="input-group">
-                <input type="number" min="0" max="100" className="input" name="tenthPercentage" placeholder="10th Percentage" value={formData.tenthPercentage} onChange={handleChange} required />
-              </div>
-              <div className="input-group">
-                <input type="number" min="0" max="100" className="input" name="interPercentage" placeholder="Intermediate Percentage" value={formData.interPercentage} onChange={handleChange} required />
+                <input type="text" name="university" placeholder="University" value={formData.university} onChange={handleChange} required />
               </div>
               <div className="input-group">
                 <select
                   name="graduation"
-                  placeholder="Graduation" className="input"
                   value={formData.graduation}
                   onChange={handleChange}
                   required
@@ -390,7 +414,6 @@ const MultiStepForm = () => {
                 <div className="input-group">
                   <select
                     name="branch"
-                    placeholder="Branch" className="input"
                     value={formData.branch}
                     onChange={handleChange}
                     required
@@ -407,7 +430,6 @@ const MultiStepForm = () => {
               <div className="input-group">
                 <select
                   name="year"
-                  placeholder="Year" className="input"
                   value={formData.year}
                   onChange={handleChange}
                   required
@@ -419,64 +441,84 @@ const MultiStepForm = () => {
               <div className="input-group">
                 <input type="number" name="passedOutYear" className="input" placeholder="Passed Out Year" value={formData.passedOutYear} onChange={handleChange} required />
               </div>
+
+              {/* Add more details */}
+              {addMoreClicked === 0 && (
+                <button type="button" onClick={handleAddMore}>Add More</button>
+              )}
+              {addMoreClicked > 0 && (
+                <>
+                  <div className="input-group">
+                    <input type="text" name="tenthSchool" placeholder="10th School" value={formData.tenthSchool} onChange={handleChange} required />
+                  </div>
+                  <div className="input-group">
+                    <input type="number" name="tenthPercentage" placeholder="10th Percentage" value={formData.tenthPercentage} onChange={handleChange} required />
+                  </div>
+                  <div className="input-group">
+                    <input type="number" name="tenthPassOutYear" placeholder="10th Pass Out Year" value={formData.tenthPassOutYear} onChange={handleChange} required />
+                  </div>
+                  <div className="input-group">
+                    <input type="text" name="interCollege" placeholder="Intermediate College" value={formData.interCollege} onChange={handleChange} required />
+                  </div>
+                  <div className="input-group">
+                    <input type="number" name="interPercentage" placeholder="Intermediate Percentage" value={formData.interPercentage} onChange={handleChange} required />
+                  </div>
+                  <div className="input-group">
+                    <input type="number" name="interPassOutYear" placeholder="Intermediate Pass Out Year" value={formData.interPassOutYear} onChange={handleChange} required />
+                  </div>
+                  {addMoreClicked < 2 && (
+                    <button type="button" onClick={handleAddMore}>Add More</button>
+                  )}
+                </>
+              )}
+
               <div className="button-group">
                 <button type="button" onClick={() => setStep(step - 1)}>Back</button>
                 <button type="submit">Next</button>
               </div>
             </div>
           )}
-
-          {/* Step 4 - Preview */}
+          {/* Step 4 */}
           {step === 4 && (
             <div className="form-step">
-              <h2>Preview</h2>
-              <div className="preview-details">
-                <p><strong>Image:</strong></p>
-                {imagePreview && <img src={imagePreview} alt="Preview" className="image-preview" />}
-              </div>
-              <div className="preview-details">
-                <p><strong>Name:</strong> {formData.name}</p>
-                <p><strong>Surname:</strong> {formData.surname}</p>
+              <h2>Review and Submit</h2>
+              <div className="review-section">
+                <h3>Personal Information</h3>
+                <img src={imagePreview} alt="Uploaded" style={{ width: '100px', height: 'auto' }} />
+                <p><strong>Name:</strong> {formData.surname} {formData.middlename} {formData.name}</p>
                 <p><strong>Mobile:</strong> {formData.mobile}</p>
                 <p><strong>Gender:</strong> {formData.gender}</p>
                 <p><strong>Email:</strong> {formData.email}</p>
+              </div>
+              <div className="review-section">
+                <h3>Address</h3>
                 <p><strong>Permanent Address:</strong> {formData.permanentAddress}</p>
                 <p><strong>Current Address:</strong> {formData.currentAddress}</p>
                 <p><strong>Pincode:</strong> {formData.pincode}</p>
                 <p><strong>State:</strong> {formData.state}</p>
                 <p><strong>City:</strong> {formData.city}</p>
-                <p><strong>10th Percentage:</strong> {formData.tenthPercentage}</p>
-                <p><strong>Intermediate Percentage:</strong> {formData.interPercentage}</p>
+              </div>
+              <div className="review-section">
+                <h3>Education Details</h3>
+                <p><strong>University</strong> {formData.university}</p>
                 <p><strong>Graduation:</strong> {formData.graduation}</p>
                 <p><strong>Branch:</strong> {formData.branch}</p>
                 <p><strong>Year:</strong> {formData.year}</p>
-                <p><strong>Passed Out Year:</strong> {formData.passedOutYear}</p>
+                <p><strong>Intermediate:</strong> {formData.interCollege}</p>
+                <p><strong>Percentage:</strong> {formData.interPercentage}</p>
+                <p><strong>Passed Out Year:</strong> {formData.interPassOutYear}</p>
+                <p><strong>School:</strong> {formData.tenthSchool}</p>
+                <p><strong>Percentage:</strong> {formData.tenthPercentage}</p>
+                <p><strong>Passed Out Year</strong> {formData.tenthPassOutYear}</p>
+
+
               </div>
               <div className="button-group">
-                <button type="button" onClick={() => setStep(3)}>Update</button>
-                <button type="button" className="del" onClick={() => {
-                  localStorage.removeItem('formData');
-                  setFormData({
-                    name: '',
-                    surname: '',
-                    mobile: '',
-                    gender: '',
-                    email: '',
-                    permanentAddress: '',
-                    currentAddress: '',
-                    pincode: '',
-                    state: '',
-                    city: '',
-                    graduation: '',
-                    year: '',
-                    image: null
-                  });
-                  setStep(1);
-                  setSupermanProgress(0); // Reset Superman progress after deletion
-                }}>Delete</button>
-                <button type="submit" className="final-submit">Submit</button>
-                <button type="button" onClick={handleDownloadPDF}>Download PDF</button>
-
+                <button type="button" class="del">Back</button>
+                <button type="submit" class="final-submit">Submit</button>
+                <div className="pdf-button">
+                  <button onClick={handleDownloadPDF}>Download as PDF</button>
+                </div>
               </div>
             </div>
           )}
